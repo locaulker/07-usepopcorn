@@ -47,7 +47,7 @@ const tempWatchedData = [
   }
 ]
 
-const average = (arr) =>
+const average = arr =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
 const KEY = "f5ddaba"
@@ -55,11 +55,31 @@ const KEY = "f5ddaba"
 export default function App() {
   const [movies, setMovies] = useState([])
   const [watched, setWatched] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const query = "interstellar"
 
   useEffect(function () {
-    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`)
-      .then((res) => res.json())
-      .then((data) => setMovies(data.Search))
+    async function fetchMovies() {
+      try {
+        setIsLoading(true)
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+        )
+
+        if (!res.ok)
+          throw new Error("Oops! Something went wrong while fetching movies")
+
+        const data = await res.json()
+        setMovies(data.Search)
+      } catch (err) {
+        console.error(err.message)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchMovies()
   }, [])
 
   return (
@@ -70,7 +90,10 @@ export default function App() {
       </NavBar>
       <Main>
         <Box>
-          <MovieList movies={movies} />
+          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MovieList movies={movies} />}
+          {error && <ErrorMessage message={error} />}
         </Box>
 
         <Box>
@@ -79,6 +102,18 @@ export default function App() {
         </Box>
       </Main>
     </>
+  )
+}
+
+function Loader() {
+  return <p className="loader">Loading...</p>
+}
+
+function ErrorMessage({ message }) {
+  return (
+    <p className="error">
+      <span>⛔️</span> {message}
+    </p>
   )
 }
 
@@ -109,7 +144,7 @@ function Search() {
       type="text"
       placeholder="Search movies..."
       value={query}
-      onChange={(e) => setQuery(e.target.value)}
+      onChange={e => setQuery(e.target.value)}
     />
   )
 }
@@ -131,7 +166,7 @@ function Box({ children }) {
 
   return (
     <div className="box">
-      <button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
+      <button className="btn-toggle" onClick={() => setIsOpen(open => !open)}>
         {isOpen ? "–" : "+"}
       </button>
 
@@ -167,7 +202,7 @@ function WatchedBox() {
 function MovieList({ movies }) {
   return (
     <ul className="list">
-      {movies?.map((movie) => (
+      {movies?.map(movie => (
         <Movie movie={movie} key={movie.imdbID} />
       ))}
     </ul>
@@ -190,9 +225,9 @@ function Movie({ movie }) {
 }
 
 function WatchedSummary({ watched }) {
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating))
-  const avgUserRating = average(watched.map((movie) => movie.userRating))
-  const avgRuntime = average(watched.map((movie) => movie.runtime))
+  const avgImdbRating = average(watched.map(movie => movie.imdbRating))
+  const avgUserRating = average(watched.map(movie => movie.userRating))
+  const avgRuntime = average(watched.map(movie => movie.runtime))
 
   return (
     <div className="summary">
@@ -222,7 +257,7 @@ function WatchedSummary({ watched }) {
 function WatchedMoviesList({ watched }) {
   return (
     <ul className="list">
-      {watched.map((movie) => (
+      {watched.map(movie => (
         <WatchedMovie movie={movie} key={movie.imdbID} />
       ))}
     </ul>
