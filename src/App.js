@@ -275,7 +275,7 @@ function MovieDetails({ selectedId, onCloseMovie }) {
 
   useEffect(
     function () {
-      setIsLoading()
+      setIsLoading(true)
       async function getMovieDetails() {
         const res = await fetch(
           `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
