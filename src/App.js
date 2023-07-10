@@ -247,7 +247,7 @@ function MovieList({ movies, onSelectMovie }) {
 function Movie({ movie, onSelectMovie }) {
   return (
     <li onClick={() => onSelectMovie(movie.imdbID)}>
-      <img src={movie.Poster} alt={`${movie.title} poster`} />
+      <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>
         <p>
@@ -282,7 +282,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched }) {
       title,
       year,
       poster,
-      ImdbRating: Number(imdbRating),
+      imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0))
     }
 
