@@ -341,7 +341,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
             <div className="rating">
               {!isWatched ? (
                 <>
-                  {" "}
                   <StarRating
                     maxRating={10}
                     size={24}
@@ -351,7 +350,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
                     <button className="btn-add" onClick={handleAdd}>
                       + Add to list
                     </button>
-                  )}{" "}
+                  )}
                 </>
               ) : (
                 <p>
