@@ -54,7 +54,7 @@ const average = arr =>
 const KEY = "f5ddaba"
 
 export default function App() {
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState("Inception")
   const [movies, setMovies] = useState([])
   const [watched, setWatched] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -100,9 +100,8 @@ export default function App() {
           setMovies(data.Search)
           setError("")
         } catch (err) {
-          console.error(error.message)
-
           if (err.name !== "AbortError") {
+            console.log(error.message)
             setError(err.message)
           }
         } finally {
@@ -114,13 +113,15 @@ export default function App() {
         setError("")
         return
       }
+
+      handleCloseMovie()
       fetchMovies()
 
       return function () {
         controller.abort()
       }
     },
-    [query]
+    [query, error.message]
   )
 
   return (
@@ -319,6 +320,23 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
   useEffect(
     function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie()
+        }
+      }
+
+      document.addEventListener("keydown", callback)
+
+      return function () {
+        document.removeEventListener("keydown", callback)
+      }
+    },
+    [onCloseMovie]
+  )
+
+  useEffect(
+    function () {
       setIsLoading(true)
       async function getMovieDetails() {
         const res = await fetch(
@@ -340,7 +358,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
       return function () {
         document.title = "usePopcorn"
-        console.log(`Clean up effect for movie ${title}`)
+        // console.log(`Clean up effect for movie ${title}`)
       }
     },
     [title]
